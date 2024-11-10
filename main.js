@@ -4,7 +4,6 @@ const menuBtnIcon = menuBtn.querySelector("i");
 
 menuBtn.addEventListener("click", (e) => {
   navLinks.classList.toggle("open");
-
   const isOpen = navLinks.classList.contains("open");
   menuBtnIcon.setAttribute(
     "class",
@@ -43,3 +42,9 @@ const swiper = new Swiper(".swiper", {
     disableOnInteraction: false, 
   },
 });
+
+function scrollTotalPrice(){
+  document.getElementById('totalPrice').scrollIntoView({
+    behavior: "smooth"
+  });
+}

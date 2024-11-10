@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="style.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -20,7 +19,7 @@
 <header class="header">
   <nav>
     <div class="nav__bar">
-      <div class="logo nav__logo">
+      <div class="logo">
         <a href="#"><img src="assets/logo1.png" alt="logo" /></a>
       </div>
       <div class="nav__menu__btn" id="menu-btn">
@@ -28,10 +27,9 @@
       </div>
     </div>
     <ul class="nav__links" id="nav-links">
-      <li><a href="deleteLog.php">Kiểm tra xe</a></li>
-      <li><a href="changedPriceLog.php">Kiểm tra giá</a></li>
+      <li><a href="#info">Thông tin xe</a></li>
       <li><a href="vehicleTotalPrice.php">Giá lăn bánh</a></li>
-      <button class="btn">Contact Us</button>
+      <button class="btn"><a href="login.php">Login</a></button>
     </ul>
   </nav>
   <div class="section__container header__container" id="home">
@@ -42,30 +40,31 @@
 </header>
 
 <body>
-  <?php
-  $conn = oci_connect(
-    'c##XUANDONGTEST',
-    '123456',
-    'localhost:1521/orcl21',
-    'AL32UTF8'
-  );
+  <section id="info">
+    <?php
+    $conn = oci_connect(
+      'c##XUANDONGTEST',
+      '123456',
+      'localhost:1521/orcl21',
+      'AL32UTF8'
+    );
 
-  if (!$conn) {
-    $e = oci_error();
-    echo "Kết nối thất bại: " . htmlentities($e['message']);
-  } else {
-    echo "<script>console.log('Connection succeeded');</script>";
-  }
+    if (!$conn) {
+      $e = oci_error();
+      echo "Kết nối thất bại: " . htmlentities($e['message']);
+    } else {
+      echo "<script>console.log('Connection succeeded');</script>";
+    }
 
-  $sql = "SELECT MA_XE, DONG_XE, PHIEN_BAN, PHAN_KHUC, DONG_CO, GIA_NIEM_YET, DAM_PHAN FROM XE";
-  $result = oci_parse($conn, $sql);
-  oci_execute($result);
+    $sql = "SELECT MA_XE, DONG_XE, PHIEN_BAN, PHAN_KHUC, DONG_CO, GIA_NIEM_YET, DAM_PHAN FROM XE";
+    $result = oci_parse($conn, $sql);
+    oci_execute($result);
 
-  echo '<div class="container mt-3">';
-  echo '<h1>BẢNG GIÁ XE</h1>';
-  echo '<table class="table table-bordered">';
-  echo '<thead>';
-  echo '<tr>
+    echo '<div class="container mt-3">';
+    echo '<h1>BẢNG GIÁ XE</h1>';
+    echo '<table class="table table-bordered">';
+    echo '<thead>';
+    echo '<tr>
             <th>Mã xe</th>
             <th>Dòng xe</th>
             <th>Phiên bản</th>
@@ -73,34 +72,27 @@
             <th>Động cơ</th>
             <th>Giá niêm yết</th>
             <th>Đàm phán</th>
-            <th>Thao tác</th>
           </tr>';
-  echo '</thead>';
-  echo '<tbody>';
+    echo '</thead>';
+    echo '<tbody>';
 
-  while ($row = oci_fetch_assoc($result)) {
-    echo '<tr>';
-    echo "<td>" . htmlspecialchars($row['MA_XE']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['DONG_XE']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['PHIEN_BAN']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['PHAN_KHUC']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['DONG_CO']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['GIA_NIEM_YET']) . "</td>";
-    echo "<td>" . htmlspecialchars($row['DAM_PHAN']) . "</td>";
-    echo '<td>';
-    echo '<div style="display: flex; gap: 5px;">';
-    echo '<button type="button" class="btn" onclick ="openChangeCostForm(\'' . htmlspecialchars($row['MA_XE']) . '\')">Sửa giá</button> ';
-    echo '<button type="button" class="btn" onclick="deleteItem(\'' . htmlspecialchars($row['MA_XE']) . '\')">Xóa</button>';
+    while ($row = oci_fetch_assoc($result)) {
+      echo '<tr>';
+      echo "<td>" . htmlspecialchars($row['MA_XE']) . "</td>";
+      echo "<td>" . htmlspecialchars($row['DONG_XE']) . "</td>";
+      echo "<td>" . htmlspecialchars($row['PHIEN_BAN']) . "</td>";
+      echo "<td>" . htmlspecialchars($row['PHAN_KHUC']) . "</td>";
+      echo "<td>" . htmlspecialchars($row['DONG_CO']) . "</td>";
+      echo "<td>" . htmlspecialchars($row['GIA_NIEM_YET']) . "</td>";
+      echo "<td>" . htmlspecialchars($row['DAM_PHAN']) . "</td>";
+      echo '</tr>';
+    }
+
+    echo '</tbody>';
+    echo '</table>';
     echo '</div>';
-    echo '</td>';
-    echo '</tr>';
-  }
-
-  echo '</tbody>';
-  echo '</table>';
-  echo '</div>';
-  ?>
-
+    ?>
+  </section>
 </body>
 
 <section class="section__container testimonial__container" id="client">
@@ -152,22 +144,6 @@
 </section>
 
 <footer class="footer">
-  <div class="section__container subscribe__container">
-    <div class="subscribe__content">
-      <p class="section__subheader">OUR NEWSLETTER</p>
-      <h2 class="section__header">Subscribe To Our Newsletter</h2>
-      <p class="section__description">
-        Subscribe to our newsletter and receive exclusive content, expert
-        insights, and special offers delivered directly to your inbox.
-      </p>
-    </div>
-    <div class="subscribe__form">
-      <form action="/">
-        <input type="text" placeholder="Your Email" />
-        <button class="btn">Subscribe</button>
-      </form>
-    </div>
-  </div>
   <div class="section__container footer__container">
     <div class="footer__col">
       <div class="logo footer__logo">
@@ -177,29 +153,29 @@
         With a rich legacy spanning 25 years, our commitment to excellence
         in car servicing is unwavering.
       </p>
-      <ul class="footer__socials">
-        <li>
-          <a href="#"><i class="ri-facebook-fill"></i></a>
-        </li>
-        <li>
-          <a href="#"><i class="ri-google-fill"></i></a>
-        </li>
-        <li>
-          <a href="#"><i class="ri-instagram-line"></i></a>
-        </li>
-        <li>
-          <a href="#"><i class="ri-youtube-line"></i></a>
-        </li>
-      </ul>
     </div>
     <div class="footer__col">
-      <h4>Our Services</h4>
-      <ul class="footer__links">
-        <li><a href="#">Skilled Mechanics</a></li>
-        <li><a href="#">Routine Maintenance</a></li>
-        <li><a href="#">Customized Solutions</a></li>
-        <li><a href="#">Competitive Pricing</a></li>
-        <li><a href="#">Satisfaction Guaranteed</a></li>
+      <h4>Our Socials</h4>
+      <ul class="footer__socials">
+        <li>
+          <a href="https://www.facebook.com/nauXgnoD.Y/">
+            <i class="ri-facebook-fill"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.instagram.com/__xuandong/">
+            <i class="ri-instagram-line"></i></a>
+        </li>
+        <li>
+          <a href="https://github.com/xuandongdev">
+            <i class="ri-github-fill"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.linkedin.com/in/xuandongdev/">
+            <i class="ri-linkedin-box-fill"></i>
+          </a>
+        </li>
       </ul>
     </div>
     <div class="footer__col">

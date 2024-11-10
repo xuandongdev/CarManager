@@ -28,6 +28,7 @@
             </div>
         </div>
         <ul class="nav__links" id="nav-links">
+            <li><a href="index.php">Thông tin xe</a></li>
             <li><a href="deleteLog.php">Kiểm tra xe</a></li>
             <li><a href="changedPriceLog.php">Kiểm tra giá</a></li>
             <li><a href="vehicleTotalPrice.php">Giá lăn bánh</a></li>
@@ -80,132 +81,7 @@
     echo '</div>';
     ?>
 </body>
-<section class="section__container testimonial__container" id="client">
-    <p class="section__subheader">CLIENT TESTIMONIALS</p>
-    <h2 class="section__header">100% Approved By Customers</h2>
-    <!-- Slider main container -->
-    <div class="swiper">
-        <!-- Additional required wrapper -->
-        <div class="swiper-wrapper">
-            <!-- Slides -->
-            <div class="swiper-slide">
-                <div class="testimonial__card">
-                    <img src="assets/nixinh.jpg" alt="testimonial" />
-                    <p>
-                        "Tôi đã có một trải nghiệm tuyệt vời khi mua xe tại đây. Nhân viên rất nhiệt tình và chu đáo, họ
-                        giải đáp
-                        mọi thắc mắc của tôi một cách tận tâm, từ tính năng xe đến các lựa chọn tài chính. Không khí tại
-                        cửa hàng
-                        thoải mái và thân thiện, giúp tôi có cảm giác yên tâm khi ra quyết định. Đây thực sự là một nơi
-                        đáng để
-                        tin tưởng!
-                    </p>
-                    <h4>- Ni Xinh.</h4>
-                </div>
-            </div>
-            <div class="swiper-slide">
-                <div class="testimonial__card">
-                    <img src="assets/ngochoa.jpg" alt="testimonial" />
-                    <p>
-                        "Tôi rất hài lòng với sự chuyên nghiệp và tận tâm của đội ngũ tại cửa hàng. Họ không chỉ giúp
-                        tôi chọn lựa
-                        mẫu xe phù hợp mà còn hỗ trợ chi tiết về các thủ tục mua xe và đăng ký. Nhờ vậy, tôi cảm thấy an
-                        tâm và
-                        tin tưởng vào quyết định của mình. Tôi chắc chắn sẽ giới thiệu cửa hàng cho bạn bè và người
-                        thân!"
-                    </p>
-                    <h4>- Hoa Trinh Ngoc.</h4>
-                </div>
-            </div>
-            <div class="swiper-slide">
-                <div class="testimonial__card">
-                    <img src="assets/huudan.jpg" alt="testimonial" />
-                    <p>
-                        "Trải nghiệm mua xe tại cửa hàng vượt ngoài mong đợi của tôi. Sự chuyên nghiệp, minh bạch và tư
-                        vấn rõ
-                        ràng từ đội ngũ bán hàng giúp tôi chọn được chiếc xe ưng ý mà không gặp bất kỳ khó khăn nào. Tôi
-                        đặc biệt
-                        ấn tượng với dịch vụ hậu mãi và sự hỗ trợ nhiệt tình ngay cả sau khi mua xe."
-                    </p>
-                    <h4>- Dan Duong.</h4>
-                </div>
-            </div>
-        </div>
-        <!-- If we need pagination -->
-        <div class="swiper-pagination"></div>
-    </div>
-</section>
 
-<footer class="footer">
-    <div class="section__container subscribe__container">
-        <div class="subscribe__content">
-            <p class="section__subheader">OUR NEWSLETTER</p>
-            <h2 class="section__header">Subscribe To Our Newsletter</h2>
-            <p class="section__description">
-                Subscribe to our newsletter and receive exclusive content, expert
-                insights, and special offers delivered directly to your inbox.
-            </p>
-        </div>
-        <div class="subscribe__form">
-            <form action="/">
-                <input type="text" placeholder="Your Email" />
-                <button class="btn">Subscribe</button>
-            </form>
-        </div>
-    </div>
-    <div class="section__container footer__container">
-        <div class="footer__col">
-            <div class="logo footer__logo">
-                <a href="#"><img src="assets/logo2.png" alt="logo" /></a>
-            </div>
-            <p class="section__description">
-                With a rich legacy spanning 25 years, our commitment to excellence
-                in car servicing is unwavering.
-            </p>
-            <ul class="footer__socials">
-                <li>
-                    <a href="#"><i class="ri-facebook-fill"></i></a>
-                </li>
-                <li>
-                    <a href="#"><i class="ri-google-fill"></i></a>
-                </li>
-                <li>
-                    <a href="#"><i class="ri-instagram-line"></i></a>
-                </li>
-                <li>
-                    <a href="#"><i class="ri-youtube-line"></i></a>
-                </li>
-            </ul>
-        </div>
-        <div class="footer__col">
-            <h4>Our Services</h4>
-            <ul class="footer__links">
-                <li><a href="#">Skilled Mechanics</a></li>
-                <li><a href="#">Routine Maintenance</a></li>
-                <li><a href="#">Customized Solutions</a></li>
-                <li><a href="#">Competitive Pricing</a></li>
-                <li><a href="#">Satisfaction Guaranteed</a></li>
-            </ul>
-        </div>
-        <div class="footer__col">
-            <h4>Contact Info</h4>
-            <ul class="footer__links">
-                <li>
-                    <p>
-                        Experience the magic of a rejuvenated ride as we pamper your car
-                        with precision care
-                    </p>
-                </li>
-                <li>
-                    <p>Phone: <span>07 8386 7979</span></p>
-                </li>
-                <li>
-                    <p>Email: <span>xuandong.contact@carselling.com</span></p>
-                </li>
-            </ul>
-        </div>
-    </div>
-</footer>
 <div class="footer__bar">
     Copyright © XuanDongDev.
 </div>
