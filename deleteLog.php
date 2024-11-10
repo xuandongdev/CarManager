@@ -29,10 +29,8 @@
         </div>
         <ul class="nav__links" id="nav-links">
             <li><a href="index.php">Thông tin xe</a></li>
-            <li><a href="deleteLog.php">Kiểm tra xe</a></li>
-            <li><a href="changedPriceLog.php">Kiểm tra giá</a></li>
             <li><a href="vehicleTotalPrice.php">Giá lăn bánh</a></li>
-            <button class="btn">Contact Us</button>
+            <button class="btn"><a href="logout.php">Logout</a></button>
         </ul>
     </nav>
     <div class="section__container header__container" id="home">

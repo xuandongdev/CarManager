@@ -20,30 +20,28 @@
 <header class="header">
     <nav>
         <div class="nav__bar">
-        <div class="logo nav__logo">
-            <a href="#"><img src="assets/logo1.png" alt="logo" /></a>
-        </div>
-        <div class="nav__menu__btn" id="menu-btn">
-            <i class="ri-menu-3-line"></i>
-        </div>
+            <div class="logo nav__logo">
+                <a href="#"><img src="assets/logo1.png" alt="logo" /></a>
+            </div>
+            <div class="nav__menu__btn" id="menu-btn">
+                <i class="ri-menu-3-line"></i>
+            </div>
         </div>
         <ul class="nav__links" id="nav-links">
             <li><a href="index.php">Thông tin xe</a></li>
-            <li><a href="deleteLog.php">Kiểm tra xe</a></li>
-            <li><a href="changedPriceLog.php">Kiểm tra giá</a></li>
             <li><a href="vehicleTotalPrice.php">Giá lăn bánh</a></li>
-            <button class="btn">Contact Us</button>
+            <button class="btn"><a href="logout.php">Logout</a></button>
         </ul>
     </nav>
     <div class="section__container header__container" id="home">
         <div class="header__content">
-        <h1>We Are Qualified & Professional</h1>
+            <h1>We Are Qualified & Professional</h1>
         </div>
     </div>
 </header>
 
 <body>
-<?php
+    <?php
     $conn = oci_connect(
         'C##XUANDONGTEST',
         '123456',

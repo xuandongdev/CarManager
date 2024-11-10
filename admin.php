@@ -1,9 +1,13 @@
 <?php
 session_start();
-// Nếu session không tồn tại chuyển hướng sang index
+// Nếu session không tồn tại hoặc người dùng không có quyền, chuyển hướng sang index
 if (!isset($_SESSION['username'])) {
-  header('index.php');
+  header('Location: index.php');
+  exit;
 }
+
+$username = $_SESSION['username'];
+$role = $_SESSION['role']; // Lấy vai trò từ session (cần đảm bảo rằng vai trò đã được lưu trong session khi đăng nhập)
 
 // Kết nối đến Oracle Database
 $conn = oci_connect(
@@ -24,66 +28,90 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $action = $_POST['action'];
 
   if ($action == 'them_xe') {
-    // Thêm xe
-    $ma_xe = $_POST['ma_xe'];
-    $ma_hang = $_POST['ma_hang'];
-    $dong_xe = $_POST['dong_xe'];
-    $phien_ban = $_POST['phien_ban'];
-    $phan_khuc = $_POST['phan_khuc'];
-    $dong_co = $_POST['dong_co'];
-    $gia_nyet = $_POST['gia_nyet'];
-    $dam_phan = $_POST['dam_phan'];
+    // Kiểm tra quyền trước khi thực hiện thêm xe
+    if ($role == 'STORE MANAGER' || $role == 'ADMIN') {
+      // Thêm xe
+      $ma_xe = $_POST['ma_xe'];
+      $ma_hang = $_POST['ma_hang'];
+      $dong_xe = $_POST['dong_xe'];
+      $phien_ban = $_POST['phien_ban'];
+      $phan_khuc = $_POST['phan_khuc'];
+      $dong_co = $_POST['dong_co'];
+      $gia_nyet = $_POST['gia_nyet'];
+      $dam_phan = $_POST['dam_phan'];
 
-    // Gọi thủ tục THEM_XE
-    $query = "BEGIN THEM_XE(:ma_xe, :ma_hang, :dong_xe, :phien_ban, :phan_khuc, :dong_co, :gia_nyet, :dam_phan); END;";
-    $addVehicle = oci_parse($conn, $query);
-    oci_bind_by_name($addVehicle, ":ma_xe", $ma_xe);
-    oci_bind_by_name($addVehicle, ":ma_hang", $ma_hang);
-    oci_bind_by_name($addVehicle, ":dong_xe", $dong_xe);
-    oci_bind_by_name($addVehicle, ":phien_ban", $phien_ban);
-    oci_bind_by_name($addVehicle, ":phan_khuc", $phan_khuc);
-    oci_bind_by_name($addVehicle, ":dong_co", $dong_co);
-    oci_bind_by_name($addVehicle, ":gia_nyet", $gia_nyet);
-    oci_bind_by_name($addVehicle, ":dam_phan", $dam_phan);
+      // Gọi thủ tục THEM_XE
+      $query = "BEGIN THEM_XE(:ma_xe, :ma_hang, :dong_xe, :phien_ban, :phan_khuc, :dong_co, :gia_nyet, :dam_phan); END;";
+      $addVehicle = oci_parse($conn, $query);
+      oci_bind_by_name($addVehicle, ":ma_xe", $ma_xe);
+      oci_bind_by_name($addVehicle, ":ma_hang", $ma_hang);
+      oci_bind_by_name($addVehicle, ":dong_xe", $dong_xe);
+      oci_bind_by_name($addVehicle, ":phien_ban", $phien_ban);
+      oci_bind_by_name($addVehicle, ":phan_khuc", $phan_khuc);
+      oci_bind_by_name($addVehicle, ":dong_co", $dong_co);
+      oci_bind_by_name($addVehicle, ":gia_nyet", $gia_nyet);
+      oci_bind_by_name($addVehicle, ":dam_phan", $dam_phan);
 
-    if (oci_execute($addVehicle)) {
-      $message = "Thêm xe thành công!";
+      if (oci_execute($addVehicle)) {
+        $message = "Thêm xe thành công!";
+      } else {
+        $message = "Thêm xe thất bại.";
+      }
     } else {
-      $message = "Thêm xe thất bại.";
+      $message = "Bạn không có quyền thực hiện thao tác này.";
     }
   } elseif ($action == 'cap_nhat_gia') {
-    // Cập nhật giá xe
-    $ma_xe = $_POST['ma_xe'];
-    $gia_xe = $_POST['gia_xe'];
+    // Kiểm tra quyền trước khi thực hiện cập nhật giá
+    if ($role == 'STORE MANAGER' || $role == 'SALER' || $role == 'ADMIN') {
+      // Cập nhật giá xe
+      $ma_xe = $_POST['ma_xe'];
+      $gia_xe = $_POST['gia_xe'];
 
-    // Gọi thủ tục CAP_NHAT_GIA
-    $query = "BEGIN CAP_NHAT_GIA(:ma_xe, :gia_xe); END;";
-    $updatePrice = oci_parse($conn, $query);
-    oci_bind_by_name($updatePrice, ":ma_xe", $ma_xe);
-    oci_bind_by_name($updatePrice, ":gia_xe", $gia_xe);
+      // Lấy tên người dùng từ session
+      $username = $_SESSION['username']; 
 
-    if (oci_execute($updatePrice)) {
-      $message = "Cập nhật giá xe thành công!";
+      // Gọi thủ tục CAP_NHAT_GIA và truyền tên người dùng vào
+      $query = "BEGIN CAP_NHAT_GIA(:ma_xe, :gia_xe, :modified_by); END;";
+      $updatePrice = oci_parse($conn, $query);
+      oci_bind_by_name($updatePrice, ":ma_xe", $ma_xe);
+      oci_bind_by_name($updatePrice, ":gia_xe", $gia_xe);
+      oci_bind_by_name($updatePrice, ":modified_by", $username); // Truyền tên người thực hiện thao tác
+
+      if (oci_execute($updatePrice)) {
+        $message = "Cập nhật giá xe thành công!";
+      } else {
+        $message = "Cập nhật giá xe thất bại.";
+      }
     } else {
-      $message = "Cập nhật giá xe thất bại.";
+      $message = "Bạn không có quyền thực hiện thao tác này.";
     }
   } elseif ($action == 'xoa_xe') {
-    // Xóa xe
-    $ma_xe = $_POST['ma_xe'];
+    // Kiểm tra quyền trước khi thực hiện xóa xe
+    if ($role == 'STORE MANAGER' || $role == 'ADMIN') {
+      // Xóa xe
+      $ma_xe = $_POST['ma_xe'];
 
-    // Gọi thủ tục XOA_XE
-    $query = "BEGIN XOA_XE(:ma_xe); END;";
-    $deleteVehicle = oci_parse($conn, $query);
-    oci_bind_by_name($deleteVehicle, ":ma_xe", $ma_xe);
+      // Lấy tên người dùng từ session
+      $username = $_SESSION['username']; 
 
-    if (oci_execute($deleteVehicle)) {
-      $message = "Xóa xe thành công!";
+      // Gọi thủ tục XOA_XE và truyền tên người dùng vào
+      $query = "BEGIN XOA_XE(:ma_xe, :modified_by); END;";
+      $deleteVehicle = oci_parse($conn, $query);
+      oci_bind_by_name($deleteVehicle, ":ma_xe", $ma_xe);
+      oci_bind_by_name($deleteVehicle, ":modified_by", $username);
+
+      if (oci_execute($deleteVehicle)) {
+        $message = "Xóa xe thành công!";
+      } else {
+        $message = "Xóa xe thất bại.";
+      }
     } else {
-      $message = "Xóa xe thất bại.";
+      $message = "Bạn không có quyền thực hiện thao tác này.";
     }
   }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -128,6 +156,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
   <h1 style="text-align: center;">Quản lý xe - Admin</h1>
+  <?php if (isset($message)): ?>
+    <div class="alert alert-info text-center" role="alert">
+      <?php echo $message; ?>
+    </div>
+  <?php endif; ?>
 
   <!-- Thêm xe -->
   <div id="addVehicle" class="container mt-5">
