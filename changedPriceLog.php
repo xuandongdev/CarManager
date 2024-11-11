@@ -86,6 +86,48 @@
     ?>
 </body>
 
+<footer class="footer">
+    <div class="section__container footer__container">
+        <div class="footer__col">
+            <div class="logo footer__logo">
+                <a href="#"><img src="assets/logo2.png" alt="logo" /></a>
+            </div>
+            <p class="section__description">
+                With a rich legacy spanning 25 years, our commitment to excellence
+                in car servicing is unwavering.
+            </p>
+        </div>
+        <div class="footer__col">
+            <h4>Admin Control</h4>
+            <ul class="footer__control">
+                <li>
+                    <a href="changedPriceLog.php" target="_blank">Theo dõi thay đổi giá</a>
+                </li>
+                <li>
+                    <a href="deleteLog.php" target="_blank">Theo dõi xe đã xóa </a>
+                </li>
+            </ul>
+        </div>
+        <div class="footer__col">
+            <h4>Contact Info</h4>
+            <ul class="footer__links">
+                <li>
+                    <p>
+                        Experience the magic of a rejuvenated ride as we pamper your car
+                        with precision care
+                    </p>
+                </li>
+                <li>
+                    <p>Phone: <span>07 8386 7979</span></p>
+                </li>
+                <li>
+                    <p>Email: <span>xuandong.contact@carselling.com</span></p>
+                </li>
+            </ul>
+        </div>
+    </div>
+</footer>
+
 <div class="footer__bar">
     Copyright © XuanDongDev.
 </div>

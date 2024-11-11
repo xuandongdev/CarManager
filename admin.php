@@ -63,25 +63,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   } elseif ($action == 'cap_nhat_gia') {
     // Kiểm tra quyền trước khi thực hiện cập nhật giá
     if ($role == 'STORE MANAGER' || $role == 'SALER' || $role == 'ADMIN') {
-      // Cập nhật giá xe
       $ma_xe = $_POST['ma_xe'];
       $gia_xe = $_POST['gia_xe'];
+      $username = $_SESSION['username'];
 
-      // Lấy tên người dùng từ session
-      $username = $_SESSION['username']; 
+      // Bước 1: Lấy giá cũ của xe
+      $query = "SELECT GIA_NIEM_YET FROM XE WHERE MA_XE = :id_vehicle";
+      $getPrice = oci_parse($conn, $query);
+      oci_bind_by_name($getPrice, ":id_vehicle", $ma_xe);
+      oci_execute($getPrice);
 
-      // Gọi thủ tục CAP_NHAT_GIA và truyền tên người dùng vào
-      $query = "BEGIN CAP_NHAT_GIA(:ma_xe, :gia_xe, :modified_by); END;";
-      $updatePrice = oci_parse($conn, $query);
-      oci_bind_by_name($updatePrice, ":ma_xe", $ma_xe);
-      oci_bind_by_name($updatePrice, ":gia_xe", $gia_xe);
-      oci_bind_by_name($updatePrice, ":modified_by", $username); // Truyền tên người thực hiện thao tác
-
-      if (oci_execute($updatePrice)) {
-        $message = "Cập nhật giá xe thành công!";
-      } else {
-        $message = "Cập nhật giá xe thất bại.";
+      $old_price = 0;
+      if ($row = oci_fetch_assoc($getPrice)) {
+        $old_price = $row['GIA_NIEM_YET'];
       }
+
+      // Bước 2: Cập nhật giá xe qua thủ tục CAP_NHAT_GIA
+      $beginUpdateQuery = "BEGIN CAP_NHAT_GIA(:MA_XE_CN, :GIA_XE_MOI); END;";
+$updatePrice = oci_parse($conn, $beginUpdateQuery);
+oci_bind_by_name($updatePrice, ":MA_XE_CN", $ma_xe);
+oci_bind_by_name($updatePrice, ":GIA_XE_MOI", $gia_xe);
+
+// Kiểm tra kết quả thực thi
+if (oci_execute($updatePrice)) {
+    // Bước 3: Ghi lịch sử thay đổi giá
+    $logQuery = "INSERT INTO VEHICLE_PRICE_LOG (
+                      ID_VEHICLE, OLD_PRICE, NEW_PRICE, CHANGED_BY, MODIFY_TIME
+                 ) VALUES (
+                      :id_vehicle, :old_price, :new_price, :changed_by, SYSDATE
+                 )";
+    $logStatement = oci_parse($conn, $logQuery);
+    oci_bind_by_name($logStatement, ":id_vehicle", $ma_xe);
+    oci_bind_by_name($logStatement, ":old_price", $old_price);
+    oci_bind_by_name($logStatement, ":new_price", $gia_xe);
+    oci_bind_by_name($logStatement, ":changed_by", $username);
+
+    if (oci_execute($logStatement)) {
+        $message = "Cập nhật giá xe và ghi log thành công!";
+    } else {
+        $message = "Ghi log thất bại.";
+    }
+} else {
+    $message = "Cập nhật giá xe thất bại.";
+}
     } else {
       $message = "Bạn không có quyền thực hiện thao tác này.";
     }
@@ -92,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       $ma_xe = $_POST['ma_xe'];
 
       // Lấy tên người dùng từ session
-      $username = $_SESSION['username']; 
+      $username = $_SESSION['username'];
 
       // Gọi thủ tục XOA_XE và truyền tên người dùng vào
       $query = "BEGIN XOA_XE(:ma_xe, :modified_by); END;";
@@ -124,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
   <title>XuanDongCar - Admin</title>
 </head>
 
