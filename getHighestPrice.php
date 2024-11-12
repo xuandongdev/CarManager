@@ -27,7 +27,7 @@
       </div>
     </div>
     <ul class="nav__links" id="nav-links">
-      <li><a href="#info">Thông tin xe</a></li>
+      <li><a href="index.php">Thông tin xe</a></li>
       <li><a href="vehicleTotalPrice.php">Giá lăn bánh</a></li>
       <li><a href="#highestPrice">Thông tin xe giá cao nhất</a></li>
       <button class="btn"><a href="login.php">Login</a></button>
