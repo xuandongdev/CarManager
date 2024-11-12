@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <nav>
     <div class="nav__bar">
       <div class="logo">
-        <a href="#"><img src="assets/logo1.png" alt="logo" /></a>
+        <a href="index.php" target="_blank"><img src="assets/logo1.png" alt="logo" /></a>
       </div>
       <div class="nav__menu__btn" id="menu-btn">
         <i class="ri-menu-3-line"></i>
