@@ -30,6 +30,7 @@
         <ul class="nav__links" id="nav-links">
             <li><a href="index.php">Thông tin xe</a></li>
             <li><a href="vehicleTotalPrice.php">Giá lăn bánh</a></li>
+            <li><a href="getHighestPrice.php">Thông tin xe giá cao nhất</a></li>
             <button class="btn"><a href="logout.php">Logout</a></button>
         </ul>
     </nav>

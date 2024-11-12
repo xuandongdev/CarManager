@@ -30,6 +30,7 @@
     <ul class="nav__links" id="nav-links">
       <li><a href="#info">Thông tin xe</a></li>
       <li><a href="vehicleTotalPrice.php">Giá lăn bánh</a></li>
+      <li><a href="getHighestPrice.php">Thông tin xe giá cao nhất</a></li>
       <button class="btn"><a href="login.php">Login</a></button>
     </ul>
   </nav>
@@ -43,15 +44,44 @@
 <body>
 <div class="container mt-3" id="totalPrice">
     <h1>Chi Tiết Giá Lăn Bánh</h1>
-    <form method="POST" action="" >
+    <form method="POST" action="">
+        <label for="MA_TINH">Chọn tỉnh:</label>
+        <select id="MA_TINH" name="MA_TINH" required>
+            <?php
+            // Kết nối và lấy danh sách các tỉnh từ bảng GIA_LAN_BANH
+            $conn = oci_connect('c##XUANDONGTEST', '123456', 'localhost:1521/orcl21', 'AL32UTF8');
+            if (!$conn) {
+                $e = oci_error();
+                echo "Kết nối thất bại: " . htmlentities($e['message']);
+                exit;
+            }
+            
+            $sql = "SELECT MA_TINH, TEN_TINH FROM GIA_LAN_BANH ORDER BY TEN_TINH";
+            $result = oci_parse($conn, $sql);
+            oci_execute($result);
+            
+            // Đổ dữ liệu tỉnh vào dropdown
+            while ($row = oci_fetch_assoc($result)) {
+                echo "<option value='" . $row['MA_TINH'] . "'>" . htmlentities($row['TEN_TINH']) . "</option>";
+            }
+            
+            // Đóng kết nối sau khi lấy danh sách tỉnh
+            oci_free_statement($result);
+            ?>
+        </select>
+        
         <label for="MA_XE_LB">Nhập mã xe:</label>
         <input type="text" id="MA_XE_LB" name="MA_XE_LB" required>
         <button type="submit" class="btn btn-primary">Xem chi tiết</button>
     </form>
 
     <?php
+    // Kiểm tra nếu người dùng đã submit form
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $ma_xe = $_POST['MA_XE_LB'];
+        $ma_tinh = $_POST['MA_TINH'];
+
+        // Kết nối tới Oracle database
         $conn = oci_connect('c##XUANDONGTEST', '123456', 'localhost:1521/orcl21', 'AL32UTF8');
         
         if (!$conn) {
@@ -60,31 +90,40 @@
             exit;
         }
 
-        // Lấy giá niêm yết
-        $sql = "SELECT GIA_NIEM_YET FROM XE WHERE MA_XE = :ma_xe";
-        $result = oci_parse($conn, $sql);
-        oci_bind_by_name($result, ':ma_xe', $ma_xe);
-        oci_execute($result);
-        
-        // Kiểm tra kết quả
-        if ($row = oci_fetch_assoc($result)) {
-            $giaNiemYet = $row['GIA_NIEM_YET'];
+        // Gọi hàm TONG_GIA_LAN_BANH trong Oracle và nhận giá trị trả về
+        $sql = "BEGIN :tong := TONG_GIA_LAN_BANH(:ma_xe, :ma_tinh); END;";
+        $stmt = oci_parse($conn, $sql);
 
-            // Lấy phí từ bảng GIA_LAN_BANH với MA_TINH = 14 (Cần Thơ)
-            $sql = "SELECT PHI_TRUOC_BA, PHI_SD_DUONG_BO, BAO_HIEM_TNDS, PHI_DK_BIEN_SO, PHI_DANG_KIEM 
-                    FROM GIA_LAN_BANH WHERE MA_TINH = 14";
-            $result = oci_parse($conn, $sql);
-            oci_execute($result);
-            $fees = oci_fetch_assoc($result);
+        // Liên kết các biến với tham số trong PL/SQL
+        oci_bind_by_name($stmt, ":ma_xe", $ma_xe);
+        oci_bind_by_name($stmt, ":ma_tinh", $ma_tinh);
+        oci_bind_by_name($stmt, ":tong", $tong, 32);  // Biến trả về
 
-            // Tính tổng giá lăn bánh (chỉ đơn giản cộng các phí)
-            $tongGiaLanBanh = $giaNiemYet 
-                            + ($giaNiemYet * $fees['PHI_TRUOC_BA']) 
-                            + $fees['PHI_SD_DUONG_BO'] 
-                            + $fees['BAO_HIEM_TNDS'] 
-                            + $fees['PHI_DK_BIEN_SO'] 
-                            + $fees['PHI_DANG_KIEM'];
+        // Thực thi câu lệnh PL/SQL
+        oci_execute($stmt); 
+        // Truy vấn thêm để lấy giá niêm yết và phí từ các bảng khác nếu cần
+        $query = "SELECT GIA_NIEM_YET, PHI_TRUOC_BA, PHI_SD_DUONG_BO, BAO_HIEM_TNDS, PHI_DK_BIEN_SO, PHI_DANG_KIEM 
+                  FROM XE, GIA_LAN_BANH 
+                  WHERE XE.MA_XE = :ma_xe 
+                  AND GIA_LAN_BANH.MA_TINH = :ma_tinh";
 
+        $stmt2 = oci_parse($conn, $query);
+        oci_bind_by_name($stmt2, ":ma_xe", $ma_xe);
+        oci_bind_by_name($stmt2, ":ma_tinh", $ma_tinh);
+
+        // Thực thi câu lệnh truy vấn
+        oci_execute($stmt2);
+
+        // Lấy dữ liệu từ câu truy vấn
+        if ($row = oci_fetch_assoc($stmt2)) {
+          $giaNiemYet = $row['GIA_NIEM_YET'];
+            $fees = [
+                'PHI_TRUOC_BA' => $row['PHI_TRUOC_BA'],
+                'PHI_SD_DUONG_BO' => $row['PHI_SD_DUONG_BO'],
+                'BAO_HIEM_TNDS' => $row['BAO_HIEM_TNDS'],
+                'PHI_DK_BIEN_SO' => $row['PHI_DK_BIEN_SO'],
+                'PHI_DANG_KIEM' => $row['PHI_DANG_KIEM'],
+            ];
             // Hiển thị thông tin chi tiết
             echo "<h2>Thông tin chi tiết cho mã xe: $ma_xe</h2>";
             echo "<ul>";
@@ -95,12 +134,13 @@
             echo "<li>Phí đăng ký biển số: " . number_format($fees['PHI_DK_BIEN_SO'], 0, ',', '.') . " VND</li>";
             echo "<li>Phí đăng kiểm: " . number_format($fees['PHI_DANG_KIEM'], 0, ',', '.') . " VND</li>";
             echo "</ul>";
-            echo "<h3>Tổng giá lăn bánh: " . number_format($tongGiaLanBanh, 0, ',', '.') . " VND</h3>";
+            echo "<h3>Tổng giá lăn bánh: " . number_format($tong, 0, ',', '.') . " VND</h3>";
         } else {
             echo "<p>Không tìm thấy thông tin cho mã xe: $ma_xe</p>";
         }
 
         // Đóng kết nối
+        oci_free_statement($stmt);
         oci_close($conn);
     }
     ?>

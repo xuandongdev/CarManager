@@ -7,7 +7,8 @@ if (!isset($_SESSION['username'])) {
 }
 
 $username = $_SESSION['username'];
-$role = $_SESSION['role']; // Lấy vai trò từ session (cần đảm bảo rằng vai trò đã được lưu trong session khi đăng nhập)
+$role = $_SESSION['role'];
+// Lấy vai trò từ session (cần đảm bảo rằng vai trò đã được lưu trong session khi đăng nhập)
 
 // Kết nối đến Oracle Database
 $conn = oci_connect(
@@ -80,32 +81,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
       // Bước 2: Cập nhật giá xe qua thủ tục CAP_NHAT_GIA
       $beginUpdateQuery = "BEGIN CAP_NHAT_GIA(:MA_XE_CN, :GIA_XE_MOI); END;";
-$updatePrice = oci_parse($conn, $beginUpdateQuery);
-oci_bind_by_name($updatePrice, ":MA_XE_CN", $ma_xe);
-oci_bind_by_name($updatePrice, ":GIA_XE_MOI", $gia_xe);
+      $updatePrice = oci_parse($conn, $beginUpdateQuery);
+      oci_bind_by_name($updatePrice, ":MA_XE_CN", $ma_xe);
+      oci_bind_by_name($updatePrice, ":GIA_XE_MOI", $gia_xe);
 
-// Kiểm tra kết quả thực thi
-if (oci_execute($updatePrice)) {
-    // Bước 3: Ghi lịch sử thay đổi giá
-    $logQuery = "INSERT INTO VEHICLE_PRICE_LOG (
+      // Kiểm tra kết quả thực thi
+      if (oci_execute($updatePrice)) {
+        // Bước 3: Ghi lịch sử thay đổi giá
+        $logQuery = "INSERT INTO VEHICLE_PRICE_LOG (
                       ID_VEHICLE, OLD_PRICE, NEW_PRICE, CHANGED_BY, MODIFY_TIME
                  ) VALUES (
                       :id_vehicle, :old_price, :new_price, :changed_by, SYSDATE
                  )";
-    $logStatement = oci_parse($conn, $logQuery);
-    oci_bind_by_name($logStatement, ":id_vehicle", $ma_xe);
-    oci_bind_by_name($logStatement, ":old_price", $old_price);
-    oci_bind_by_name($logStatement, ":new_price", $gia_xe);
-    oci_bind_by_name($logStatement, ":changed_by", $username);
+        $logStatement = oci_parse($conn, $logQuery);
+        oci_bind_by_name($logStatement, ":id_vehicle", $ma_xe);
+        oci_bind_by_name($logStatement, ":old_price", $old_price);
+        oci_bind_by_name($logStatement, ":new_price", $gia_xe);
+        oci_bind_by_name($logStatement, ":changed_by", $username);
 
-    if (oci_execute($logStatement)) {
-        $message = "Cập nhật giá xe và ghi log thành công!";
-    } else {
-        $message = "Ghi log thất bại.";
-    }
-} else {
-    $message = "Cập nhật giá xe thất bại.";
-}
+        if (oci_execute($logStatement)) {
+          $message = "Cập nhật giá xe và ghi log thành công!";
+        } else {
+          $message = "Ghi log thất bại.";
+        }
+      } else {
+        $message = "Cập nhật giá xe thất bại.";
+      }
     } else {
       $message = "Bạn không có quyền thực hiện thao tác này.";
     }

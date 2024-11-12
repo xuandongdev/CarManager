@@ -29,7 +29,7 @@
     <ul class="nav__links" id="nav-links">
       <li><a href="#info">Thông tin xe</a></li>
       <li><a href="vehicleTotalPrice.php">Giá lăn bánh</a></li>
-      <li><a href="getHighestPrice.php">Thông tin xe giá cao nhất</a></li>
+      <li><a href="#highestPrice">Thông tin xe giá cao nhất</a></li>
       <button class="btn"><a href="login.php">Login</a></button>
     </ul>
   </nav>
@@ -41,60 +41,53 @@
 </header>
 
 <body>
-  <section id="info">
-    <?php
-    $conn = oci_connect(
-      'c##XUANDONGTEST',
-      '123456',
-      'localhost:1521/orcl21',
-      'AL32UTF8'
-    );
-
-    if (!$conn) {
-      $e = oci_error();
-      echo "Kết nối thất bại: " . htmlentities($e['message']);
-    } else {
-      echo "<script>console.log('Connection succeeded');</script>";
-    }
-
-    $sql = "SELECT MA_XE, DONG_XE, PHIEN_BAN, PHAN_KHUC, DONG_CO, GIA_NIEM_YET, DAM_PHAN FROM XE";
-    $result = oci_parse($conn, $sql);
-    oci_execute($result);
-
-    echo '<div class="container mt-3">';
-    echo '<h1>BẢNG GIÁ XE</h1>';
-    echo '<table class="table table-bordered">';
-    echo '<thead>';
-    echo '<tr>
-            <th>Mã xe</th>
-            <th>Dòng xe</th>
-            <th>Phiên bản</th>
-            <th>Phân khúc</th>
-            <th>Động cơ</th>
-            <th>Giá niêm yết</th>
-            <th>Đàm phán</th>
-          </tr>';
-    echo '</thead>';
-    echo '<tbody>';
-
-    while ($row = oci_fetch_assoc($result)) {
-      echo '<tr>';
-      echo "<td>" . htmlspecialchars($row['MA_XE']) . "</td>";
-      echo "<td>" . htmlspecialchars($row['DONG_XE']) . "</td>";
-      echo "<td>" . htmlspecialchars($row['PHIEN_BAN']) . "</td>";
-      echo "<td>" . htmlspecialchars($row['PHAN_KHUC']) . "</td>";
-      echo "<td>" . htmlspecialchars($row['DONG_CO']) . "</td>";
-      echo "<td>" . htmlspecialchars($row['GIA_NIEM_YET']) . "</td>";
-      echo "<td>" . htmlspecialchars($row['DAM_PHAN']) . "</td>";
-      echo '</tr>';
-    }
-
-    echo '</tbody>';
-    echo '</table>';
-    echo '</div>';
-    ?>
-  </section>
-</body>
+    <section id="highestPrie">
+      <?php
+      // Kết nối tới cơ sở dữ liệu Oracle
+      $conn = oci_connect(
+        'C##XUANDONGTEST',
+        '123456',
+        'localhost:1521/orcl21',
+        'AL32UTF8'
+      );
+  
+      if (!$conn) {
+        echo "Kết nối thất bại: " . htmlentities($e['message']);
+      } else {
+        echo "<script>console.log('Connection succeeded');</script>";
+      }
+  
+      // Gọi hàm PL/SQL để lấy thông tin xe có giá cao nhất
+      $sql = "BEGIN :result := LAY_XE_GIA_CAO_NHAT; END;";
+      $stmt = oci_parse($conn, $sql);
+  
+      // Định nghĩa biến bind để lưu kết quả
+      oci_bind_by_name($stmt, ":result", $result, 4000);
+  
+      // Thực thi câu lệnh PL/SQL
+      oci_execute($stmt);
+  
+      // Hiển thị kết quả trả về từ hàm
+      echo '<div class="container mt-3">';
+      echo '<h1 class="text-center">Các Xe Có Giá Niêm Yết Cao Nhất</h1>';
+  
+      // Sử dụng card để hiển thị kết quả
+      echo '<div class="card">';
+      echo '<div class="card-body">';
+      echo '<h5 class="card-title">Thông tin về các xe</h5>';
+      echo '<p class="card-text">' . htmlspecialchars($result) . '</p>';
+      echo '</div>';
+      echo '</div>';
+  
+      echo '</div>'; // Đóng container
+  
+      // Đóng kết nối Oracle
+      oci_free_statement($stmt);
+      oci_close($conn);
+      ?>
+    </section>
+  </body>
+  
 
 <section class="section__container testimonial__container" id="client">
   <p class="section__subheader">CLIENT TESTIMONIALS</p>
