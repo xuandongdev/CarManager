@@ -230,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
       <div class="col-md-6">
         <label for="dam_phan" class="form-label">Đàm Phán:</label>
-        <input type="text" name="dam_phan" id="dam_phan" class="form-control" required>
+        <input type="text" name="dam_phan" id="dam_phan" class="form-control">
       </div>
 
       <div class="col-12">

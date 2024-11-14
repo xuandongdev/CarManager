@@ -25,7 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Băm mật khẩu và chèn dữ liệu vào bảng ACCOUNTS
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        $insertSql = "INSERT INTO ACCOUNTS (USER_NAME, PASS_WORD, PHONE, EMAIL) VALUES (:username, :password, :phone, :email)";
+        $insertSql = "INSERT INTO ACCOUNTS (USER_NAME, PASS_WORD, PHONE, EMAIL) 
+                        VALUES (:username, :password, :phone, :email)";
         $insertStid = oci_parse($conn, $insertSql);
 
         oci_bind_by_name($insertStid, ":username", $username);
